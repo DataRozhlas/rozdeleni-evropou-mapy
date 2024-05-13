@@ -1,12 +1,19 @@
-import { useState } from 'react'
+import { feature } from 'topojson-client';
+import { Topology } from "topojson-specification"
+import { FeatureCollection } from 'geojson';
+import Map from './components/Map'
+import topoData_ from './assets/europa-simplified-topo.json';
+
+const topoData: Topology = topoData_ as any;
 
 function App() {
-  const [count, setCount] = useState(0)
+
+  const data = feature(topoData, topoData.objects.europa) as FeatureCollection;
+
+  console.log(data)
 
   return (
-    <>
-      <h2 className={"font-bold text-lg"}>ahoj</h2>
-    </>
+    <Map width={600} height={600} data={data} />
   )
 }
 
