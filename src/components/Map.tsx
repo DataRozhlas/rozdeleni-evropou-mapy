@@ -19,16 +19,19 @@ export default function Map({ width, height, data }: MapProps) {
 
     // Adjust the scale and translate properties to zoom in and center the map
 
+    // Create a color scale
+    const colorScale = d3.scaleSequential(d3.interpolateBlues).domain([0, data.features.length]);
+
 
     const allSvgPaths = data.features
-        .map((shape) => {
+        .map((shape, index) => {
             return (
                 <path
                     key={shape.properties?.CNTR_CODE} // Add null check
                     d={geoPathGenerator(shape) || undefined}
                     stroke="lightGrey"
                     strokeWidth={0.5}
-                    fill="grey"
+                    fill={colorScale(index)}
                     fillOpacity={0.7}
                 />
             );
