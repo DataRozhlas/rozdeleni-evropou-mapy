@@ -7,23 +7,31 @@ import topoData_ from './assets/europa-simplified-topo.json';
 
 const topoData: Topology = topoData_ as any;
 
-const windowWidth = window.innerWidth;
 
 function App() {
   const data = feature(topoData, topoData.objects.europa) as FeatureCollection;
-  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-  const updateWindowWidth = () => setWindowWidth(window.innerWidth);
+
+  const mapRef = useRef<HTMLDivElement>(null);
+  const [mapWidth, setMapWidth] = useState(0);
 
   useEffect(() => {
-    window.addEventListener('resize', updateWindowWidth);
-    return () => window.removeEventListener('resize', updateWindowWidth);
+    const updateMapWidth = () => {
+      if (mapRef.current) {
+        setMapWidth(mapRef.current.offsetWidth);
+      }
+    };
+
+    window.addEventListener('resize', updateMapWidth);
+    updateMapWidth(); // Initial update
+
+    return () => window.removeEventListener('resize', updateMapWidth);
   }, []);
 
 
   return (
-    <div className="max-w-[640px]">
-      <p></p>
-      <Map width={windowWidth} height={windowWidth * 1.4} data={data} />
+    <div ref={mapRef} className="max-w-[620px]">
+      <p>{mapRef.current?.offsetWidth}</p>
+      <Map width={mapWidth} height={mapWidth * 1.2} data={data} />
     </div>
   )
 }

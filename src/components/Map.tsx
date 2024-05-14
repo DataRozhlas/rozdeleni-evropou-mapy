@@ -15,7 +15,7 @@ export default function Map({ width, height, data }: MapProps) {
 
 
     // Fit the map to the container
-    projection.fitSize([width, height], data).scale(projection.scale() * 3).translate([projection.translate()[0] / 2, projection.translate()[1] * 1.95]);
+    projection.fitSize([width, height], data).scale(projection.scale() * 3.15).translate([projection.translate()[0] / 2, projection.translate()[1] * 1.95]);
 
     // Adjust the scale and translate properties to zoom in and center the map
 
