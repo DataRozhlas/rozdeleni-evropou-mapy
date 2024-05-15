@@ -9,6 +9,10 @@ import Map from './components/Map'
 import topoData_ from './assets/europa-simplified-topo.json';
 import dictionary from './assets/dictionary.json';
 
+import { usePostMessageWithHeight } from './hooks/usePostHeightMessage'
+
+
+
 const topoData: Topology = topoData_ as any;
 
 function findMinAndMax(data: any[][]) {
@@ -41,6 +45,9 @@ function App({ id }: { id: string }) {
   const geodata = feature(topoData, topoData.objects.europa) as FeatureCollection;
 
   const mapRef = useRef<HTMLDivElement>(null);
+
+  const { containerRef, postHeightMessage } = usePostMessageWithHeight(`map-${id}`)
+
 
   const [currentYear, setCurrentYear] = useState(2023);
 
@@ -123,8 +130,8 @@ function App({ id }: { id: string }) {
   useEffect(() => {
     if (data) {
       const currentYearIndex = (data[0] as (string | number)[]).indexOf(currentYear);
-      setTooltipEU(`Průměr EU: ${data[1][currentYearIndex]} %`);
-      setTooltipCZ(`Česko: ${(data as (string | number)[][]).find((country: (string | number)[]) => country[0] === "ČR")?.[currentYearIndex]} %`); // Add a type assertion to 'data' and access the second element of the found country
+      setTooltipEU(`Průměr EU: ${data[1][currentYearIndex]}\u00A0%`);
+      setTooltipCZ(`Česko: ${(data as (string | number)[][]).find((country: (string | number)[]) => country[0] === "ČR")?.[currentYearIndex]}\u00A0%`); // Add a type assertion to 'data' and access the second element of the found country
     }
   }, [currentYear, data]);
 
@@ -134,7 +141,7 @@ function App({ id }: { id: string }) {
       if (selectedCountry) {
         const selectedCountryData = (data as (string | number)[][]).find((country: (string | number)[]) => country[0] === selectedCountry);
         if (selectedCountryData) {
-          setTooltipSelected(`${selectedCountry}: ${selectedCountryData[currentYearIndex]} %`);
+          setTooltipSelected(`${selectedCountry}: ${selectedCountryData[currentYearIndex]}\u00A0%`);
         }
       } else {
         setTooltipSelected("Vyberte zemi z mapy");
@@ -147,17 +154,21 @@ function App({ id }: { id: string }) {
     setCurrentYear(value[0]);
   }
 
+  useEffect(() => {
+    postHeightMessage()
+  }, [processedData, containerRef, postHeightMessage])
+
 
   return (
-    <div>
+    <div ref={containerRef}>
       {processedData?.features && processedData.features.length > 0 && metaData ? (
         <div ref={mapRef} className="max-w-[620px]">
           <h1 className="text-4xl font-bold mb-2">{(metaData as any).title}</h1>
           <h2 className="mb-5">{(metaData as any).subtitle}</h2>
-          <div className="mb-5 flex gap-3">
-            <Badge>{tooltipEU}</Badge>
-            <Badge variant="secondary" >{tooltipCZ}</Badge>
-            <Badge variant="secondary" >{tooltipSelected}</Badge>
+          <div className="mb-5 flex justify-evenly gap-1">
+            <Badge className="text-center">{tooltipEU}</Badge>
+            <Badge className="text-center" variant="secondary" >{tooltipCZ}</Badge>
+            <Badge className="text-center" variant="secondary" >{tooltipSelected}</Badge>
           </div>
           <div className="relative">
             <div className="font-bold text-7xl absolute top-1 left-3 text-zinc-300">{currentYear}</div>
