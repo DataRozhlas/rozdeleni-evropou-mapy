@@ -5,10 +5,11 @@ interface MapProps {
     width: number;
     height: number;
     geodata: FeatureCollection;
+    minMax: number[];
 }
 
 
-export default function Map({ width, height, geodata }: MapProps) {
+export default function Map({ width, height, geodata, minMax }: MapProps) {
     const projection = d3.geoMercator();
     const geoPathGenerator = d3.geoPath().projection(projection);
 
@@ -22,25 +23,24 @@ export default function Map({ width, height, geodata }: MapProps) {
     // Create a color scale
     const colorScale = d3.scaleSequential(d3.interpolateOranges).domain([0, geodata.features.length]);
 
-
-    const allSvgPaths = geodata.features
-        .map((shape, index) => {
-            return (
-                <path
-                    key={shape.properties?.CNTR_CODE} // Add null check
-                    d={geoPathGenerator(shape) || undefined}
-                    stroke="lightGrey"
-                    strokeWidth={0.5}
-                    fill={colorScale(index)}
-                    fillOpacity={0.7}
-                />
-            );
-        });
+    console.log(minMax)
 
     return (
         <div >
             <svg width={width} height={height}>
-                {allSvgPaths}
+                {geodata.features
+                    .map((shape, index) => {
+                        return (
+                            <path
+                                key={shape.properties?.CNTR_CODE} // Add null check
+                                d={geoPathGenerator(shape) || undefined}
+                                stroke="lightGrey"
+                                strokeWidth={0.5}
+                                fill={colorScale(index)}
+                                fillOpacity={0.7}
+                            />
+                        );
+                    })}
             </svg>
         </div>
     );
