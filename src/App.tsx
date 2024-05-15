@@ -168,7 +168,15 @@ function App({ id }: { id: string }) {
               <p>táhlem zobrazíte starší data</p>
               <p>2023</p>
             </div>
-          </div></div>) : (
+
+          </div>
+          <div className="text-xs text-right mt-9">
+            Zdroj dat: <a className="text-blue-700" href="https://europa.eu/eurobarometer/screen/home" target="_blank">Eurobarometr</a> a <a className="text-blue-700" href="https://cvvm.soc.cas.cz/cz/" target="_blank">CVVM</a>, vizualizace iROZHLAS.cz
+          </div>
+          <div className="text-xs mt-5">
+            <span className="font-bold">Přesné znění otázky:</span> {(metaData as any).question}           </div>
+        </div>
+      ) : (
         <div>Loading...</div>
       )}
     </div>
