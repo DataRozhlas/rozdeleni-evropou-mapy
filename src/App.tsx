@@ -10,29 +10,30 @@ import dictionary from './assets/dictionary.json';
 
 const topoData: Topology = topoData_ as any;
 
-function finMinAndMax(data: any[][]) {
-  let min = Number.MIN_VALUE;
-  let max = Number.MAX_VALUE;
+// function findMinAndMax(data: any[][]) {
+//   let min = Number.MIN_VALUE;
+//   let max = Number.MAX_VALUE;
 
-  const cleanData = [...data];
-  cleanData.shift(); // Remove the header row
+//   const cleanData = [...data];
+//   cleanData.shift(); // Remove the header row
 
-  cleanData.forEach((row) => {
-    row.forEach((value) => {
-      if (value < min && value !== 0) {
-        min = value;
-      }
+//   cleanData.forEach((row) => {
+//     row.forEach((value) => {
+//       if (value < min && value !== 0) {
+//         min = value;
+//       }
 
-      if (value > max) {
-        max = value;
-      }
-    });
-  });
+//       if (value > max) {
+//         max = value;
+//       }
+//     });
+//   });
 
-  return [min, max];
+//   return [min, max];
 
-}
+// }
 
+const initialWidth = window.innerWidth > 620 ? 620 : window.innerWidth;
 
 function App({ id }: { id: string }) {
 
@@ -44,7 +45,25 @@ function App({ id }: { id: string }) {
 
   const [metaData, setMetaData] = useState(null);
   const [data, setData] = useState(null);
-  const [minMax, setMinMax] = useState([0, 0]);
+  // const [minMax, setMinMax] = useState([0, 0]);
+
+  const [mapWidth, setMapWidth] = useState(initialWidth);
+  // const [loading, setLoading] = useState(true);
+
+
+  useEffect(() => {
+    const updateMapWidth = () => {
+      if (mapRef.current) {
+        setMapWidth(mapRef.current.offsetWidth);
+        // setLoading(false);
+      }
+    };
+    updateMapWidth(); // Initial update
+    window.addEventListener('resize', updateMapWidth);
+
+    return () => window.removeEventListener('resize', updateMapWidth);
+  }, [mapRef]);
+
 
   useEffect(() => {
     const loadData = async () => {
@@ -52,27 +71,12 @@ function App({ id }: { id: string }) {
       const data = await import(`./assets/${id}.json`);
       setMetaData(metadata.default);
       setData(data.default);
-      setMinMax(finMinAndMax(data.default));
+      // setMinMax(findMinAndMax(data.default));
     };
 
     loadData();
   }, [id]);
 
-
-  const [mapWidth, setMapWidth] = useState(0);
-
-  useEffect(() => {
-    const updateMapWidth = () => {
-      if (mapRef.current) {
-        setMapWidth(mapRef.current.offsetWidth);
-      }
-    };
-
-    window.addEventListener('resize', updateMapWidth);
-    updateMapWidth(); // Initial update
-
-    return () => window.removeEventListener('resize', updateMapWidth);
-  }, []);
 
   const [processedData, setProcessedData] = useState<FeatureCollection | null>(null);
 
@@ -111,13 +115,13 @@ function App({ id }: { id: string }) {
 
   return (
     <div>
-      {processedData && data && minMax && metaData ? (
+      {processedData?.features && processedData.features.length > 0 && metaData ? (
         <div ref={mapRef} className="max-w-[620px]">
           <h1 className="text-4xl font-bold mb-2">{(metaData as any).title}</h1>
           <h2 className="mb-2">{(metaData as any).subtitle}</h2>
           <div className="relative">
             <div className="font-bold text-7xl absolute top-1 left-3 text-zinc-300">{currentYear}</div>
-            <Map width={mapWidth} height={mapWidth * 1.2} geodata={processedData} minMax={minMax} />
+            <Map width={mapWidth} height={mapWidth * 1.2} geodata={processedData} /* minMax={minMax} */ />
             <Slider className="cursor-pointer px-3 pt-3" defaultValue={[currentYear]} max={2023} min={1960} step={1} onValueChange={handleSliderValueChange} />
           </div></div>) : (
         <div>Loading...</div>
