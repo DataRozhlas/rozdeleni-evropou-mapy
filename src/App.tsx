@@ -10,6 +10,7 @@ import topoData_ from './assets/europa-simplified-topo.json';
 import dictionary from './assets/dictionary.json';
 
 import { usePostMessageWithHeight } from './hooks/usePostHeightMessage'
+import { min, set } from 'lodash';
 
 
 
@@ -125,7 +126,18 @@ function App({ id }: { id: string }) {
   const [tooltipCZ, setTooltipCZ] = useState("");
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
   const [tooltipSelected, setTooltipSelected] = useState("Vyberte zemi z mapy");
+  const [maxYear, setMaxYear] = useState(2023);
+  const [minYear, setMinYear] = useState(2004);
 
+
+  useEffect(() => {
+    if (data) {
+      const years = (data[0] as (string | number)[]).slice(1) as number[];
+      setMaxYear(Math.max(...years));
+      setMinYear(Math.min(...years));
+      setCurrentYear(Math.max(...years));
+    }
+  }, [data]);
 
   useEffect(() => {
     if (data) {
@@ -151,7 +163,14 @@ function App({ id }: { id: string }) {
 
 
   const handleSliderValueChange = (value: number[]) => {
-    setCurrentYear(value[0]);
+    const findClosest = (arr: number[], target: number) => {
+      return arr.reduce((prev, curr) => Math.abs(curr - target) < Math.abs(prev - target) ? curr : prev);
+    }
+    if (data) {
+      const years = (data[0] as (string | number)[]).slice(1) as number[];
+      const closestYear = findClosest(years, value[0]);
+      setCurrentYear(closestYear);
+    }
   }
 
   useEffect(() => {
@@ -172,12 +191,12 @@ function App({ id }: { id: string }) {
           </div>
           <div className="relative">
             <div className="font-bold text-7xl absolute top-1 left-3 text-zinc-300">{currentYear}</div>
-            <Map width={mapWidth} height={mapWidth * 1.2} geodata={processedData} minMax={minMax} setTooltip={setSelectedCountry} />
-            <Slider className="cursor-pointer px-3 pt-3" defaultValue={[currentYear]} max={2023} min={2004} step={1} onValueChange={handleSliderValueChange} />
+            <Map width={mapWidth} height={mapWidth * 1.2} geodata={processedData} minMax={minMax} setTooltip={setSelectedCountry} id={id} />
+            <Slider className="cursor-pointer px-3 pt-3" defaultValue={[currentYear]} max={maxYear} min={minYear} step={1} onValueChange={handleSliderValueChange} />
             <div className="flex justify-between text-xs pt-2">
-              <p>2004</p>
+              <p>{minYear}</p>
               <p>táhlem zobrazíte starší data</p>
-              <p>2023</p>
+              <p>{maxYear}</p>
             </div>
 
           </div>
