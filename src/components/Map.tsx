@@ -39,6 +39,7 @@ export default function Map({ width, height, geodata, minMax, setTooltip, id }: 
 
     // Create a color scale
     const colorScale = d3.scaleSequential(colorInterpolator).domain([minMax[0], minMax[1]]);
+
     return (
         <svg width={width} height={height}>
             {geodata.features

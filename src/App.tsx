@@ -6,12 +6,11 @@ import { Slider } from "@/components/ui/slider"
 import { Badge } from "@/components/ui/badge"
 
 import Map from './components/Map'
+import Legend from './components/Legend';
 import topoData_ from './assets/europa-simplified-topo.json';
 import dictionary from './assets/dictionary.json';
 
 import { usePostMessageWithHeight } from './hooks/usePostHeightMessage'
-import { min, set } from 'lodash';
-
 
 
 const topoData: Topology = topoData_ as any;
@@ -179,7 +178,7 @@ function App({ id }: { id: string }) {
 
 
   return (
-    <div ref={containerRef}>
+    <div ref={containerRef} className='pb-3'>
       {processedData?.features && processedData.features.length > 0 && metaData ? (
         <div ref={mapRef} className="max-w-[620px]">
           <h1 className="text-4xl font-bold mb-2">{(metaData as any).title}</h1>
@@ -190,7 +189,15 @@ function App({ id }: { id: string }) {
             <Badge className="text-center" variant="secondary" >{tooltipSelected}</Badge>
           </div>
           <div className="relative">
-            <div className="font-bold text-7xl absolute top-1 left-3 text-zinc-300">{currentYear}</div>
+            <div className="absolute top-1 left-3">
+              <div className="font-bold text-7xl  text-zinc-300">{currentYear}
+              </div>
+              <div>
+                <Legend id={id} minMax={minMax} />
+              </div>
+
+            </div>
+
             <Map width={mapWidth} height={mapWidth * 1.2} geodata={processedData} minMax={minMax} setTooltip={setSelectedCountry} id={id} />
             <Slider className="cursor-pointer px-3 pt-3" defaultValue={[currentYear]} max={maxYear} min={minYear} step={1} onValueChange={handleSliderValueChange} />
             <div className="flex justify-between text-xs pt-2">
